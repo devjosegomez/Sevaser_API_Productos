@@ -7,10 +7,14 @@ const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
 
+// si no utilizamos cors no funciona en el front end
+const cors = require("cors")
+
 const db = "Sevaser";
 
 //creating a new app using express
 const app = express();
+app.use(cors())
 
 //ejs template engine
 app.set('view engine', 'ejs');
