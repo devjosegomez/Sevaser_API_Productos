@@ -99,6 +99,41 @@ app.delete("/api/datos", function(req, res){
 });
 
 
+//POST 
+app.post("/api/datos/template", function(req, res){
+    //Create the new article with their key and value 
+    const day = new Date();
+    console.log(day)
+    const newDato = new Dato({
+        account: {
+            "username": "Invitado"
+        },
+        datosFiesta:{
+            "partyType": req.body.datosFiesta.partyType,
+            "gastoEstimado": 0,
+            "numeroPersonas": 0,
+            "costoPorPersona": 0,
+            "createdOn": day,
+            "dateParty": day
+        },
+        comidas: req.body.comidas,
+        bebidas: req.body.bebidas,
+        botanas: req.body.botanas,
+        desechables: req.body.desechables,
+        listaCompras: req.body.listaCompras,
+        overview: req.body.overview
+    });
+
+    //save into the database
+    newDato.save(function(err){
+        if(!err){
+            res.send("Successfully added");
+        }else{
+            res.send("Try again, and error was occur: " + err);
+        }
+    });
+});
+
 app.listen(3000, function() {
     console.log("SearmApp API has started on port 3000");
 });
