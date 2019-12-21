@@ -1,12 +1,13 @@
 //SearmApp
 //Cohort 18 Generation Mexico
+//https://github.com/devjosegomez
 
 const express = require("express");
 const bodyParser = require("body-parser");
 const ejs = require("ejs");
 const mongoose = require('mongoose');
 
-const db = "SearmApp";
+const db = "Sevaser";
 
 //creating a new app using express
 const app = express();
@@ -28,29 +29,31 @@ app.use(express.static("public"));
 // {versionKey: false} disable _v 
 mongoose.connect("mongodb://localhost:27017/"+db, {useNewUrlParser: true, useUnifiedTopology: true});
 
-const ProductoSchema = {
+const DatosSchema = {
+    account: Object,
+    datosFiesta: Object,
     comidas: Object ,
     bebidas: Object ,
     botanas: Object ,
-    desechables: Object
+    desechables: Object,
+    listaCompras: Object,
+    overview: Object
 }
 
-//Define model (its going to convert it into 'productos' plural, lowercase)
-const Producto = mongoose.model("Producto", ProductoSchema);
+//Define model (its going to convert it into 'datos' plural, lowercase)
+const Dato = mongoose.model("Dato", DatosSchema);
 
 //Express route
 //Methods
 
 //GET
-app.get("/productos", function(req, res){
-    //retrive all the productos
-    Producto.find(function (err, foundProductos){
+app.get("/api/datos", function(req, res){
+    //retrive all the data
+    Dato.find(function (err, foundDatos){
         if(!err){
-            //show into cmd console
-            //console.log(foundProductos);
-            
-            //send the found articles
-            res.send(foundProductos);
+
+            //send the found data
+            res.send(foundDatos);
         }else{
             res.send(err);
         }
@@ -59,18 +62,22 @@ app.get("/productos", function(req, res){
 
 
 //POST
-app.post("/productos", function(req, res){
+app.post("/api/datos", function(req, res){
     //Create the new article with their key and value 
 
-    const newProducto = new Producto({
+    const newDato = new Dato({
+        account: req.body.account,
+        datosFiesta: req.body.datosFiesta,
         comidas: req.body.comidas,
         bebidas: req.body.bebidas,
         botanas: req.body.botanas,
-        desechables: req.body.desechables
+        desechables: req.body.desechables,
+        listaCompras: req.body.listaCompras,
+        overview: req.body.overview
     });
 
     //save into the database
-    newProducto.save(function(err){
+    newDato.save(function(err){
         if(!err){
             res.send("Successfully added");
         }else{
@@ -81,16 +88,51 @@ app.post("/productos", function(req, res){
 
 
 //Delete
-app.delete("/productos", function(req, res){
-    Producto.deleteMany(function(err){
+app.delete("/api/datos", function(req, res){
+    Dato.deleteMany(function(err){
         if(!err){
-            res.send("Successfully deleted all the articles!")
+            res.send("Successfully deleted all the data!")
         }else{
-            res.send("Failed to delete all the articles, err:" + err);
+            res.send("Failed to delete all the data, err:" + err);
         }
     });
 });
 
+
+//POST 
+app.post("/api/datos/template", function(req, res){
+    //Create the new article with their key and value 
+    const day = new Date();
+    console.log(day)
+    const newDato = new Dato({
+        account: {
+            "username": "Invitado"
+        },
+        datosFiesta:{
+            "partyType": req.body.datosFiesta.partyType,
+            "gastoEstimado": 0,
+            "numeroPersonas": 0,
+            "costoPorPersona": 0,
+            "createdOn": day,
+            "dateParty": day
+        },
+        comidas: req.body.comidas,
+        bebidas: req.body.bebidas,
+        botanas: req.body.botanas,
+        desechables: req.body.desechables,
+        listaCompras: req.body.listaCompras,
+        overview: req.body.overview
+    });
+
+    //save into the database
+    newDato.save(function(err){
+        if(!err){
+            res.send("Successfully added");
+        }else{
+            res.send("Try again, and error was occur: " + err);
+        }
+    });
+});
 
 app.listen(3000, function() {
     console.log("SearmApp API has started on port 3000");
